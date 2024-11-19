@@ -1,7 +1,7 @@
 
 # Bibliotecas necesarias
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -202,30 +202,81 @@ def predict_emotion():
         messagebox.showerror("Error", f"No se pudo realizar la predicción.\n{e}")
 
 # Interfaz gráfica
-root = tk.Tk()
-root.title("Análisis de Emociones")
-root.geometry("400x400")
+def create_interface():
+    # Crear ventana principal
+    root = tk.Tk()
+    root.title("Análisis de Emociones")
+    root.geometry("500x600")
+    root.configure(bg="#e8f4fc")  # Fondo azul claro
 
-# Botones
-btn_load = tk.Button(root, text="Cargar archivo CSV", command=load_dataset)
-btn_load.pack(pady=10)
+    # Título principal
+    title_label = tk.Label(
+        root,
+        text="Análisis de Emociones",
+        font=("Helvetica", 20, "bold"),
+        bg="#e8f4fc",
+        fg="#004c99"  # Azul oscuro
+    )
+    title_label.pack(pady=20)
 
-btn_train = tk.Button(root, text="Entrenar modelo", command=train_model)
-btn_train.pack(pady=10)
+    # Frame para botones de carga y entrenamiento
+    frame_buttons = tk.Frame(root, bg="#e8f4fc")
+    frame_buttons.pack(pady=20)
 
-btn_evaluate = tk.Button(root, text="Evaluar modelo", command=evaluate_model)
-btn_evaluate.pack(pady=10)
+    # Estilo para botones
+    button_style = {
+        "font": ("Helvetica", 12),
+        "bg": "#007ACC",
+        "fg": "white",
+        "relief": "flat",
+        "width": 20,
+        "bd": 4
+    }
 
-lbl_sentence = tk.Label(root, text="Ingresa una frase para predecir la emoción:")
-lbl_sentence.pack(pady=10)
+    # Botones principales
+    btn_load = tk.Button(frame_buttons, text="📂 Cargar archivo CSV", command=load_dataset, **button_style)
+    btn_load.pack(pady=10)
 
-entry_sentence = tk.Entry(root, width=50)
-entry_sentence.pack(pady=10)
+    btn_train = tk.Button(frame_buttons, text="🚀 Entrenar modelo", command=train_model, **button_style)
+    btn_train.pack(pady=10)
 
-btn_predict = tk.Button(root, text="Predecir emoción", command=predict_emotion)
-btn_predict.pack(pady=10)
+    btn_evaluate = tk.Button(frame_buttons, text="📊 Evaluar modelo", command=evaluate_model, **button_style)
+    btn_evaluate.pack(pady=10)
 
-# Variables globales
+    # Frame para predicción
+    frame_predict = tk.Frame(root, bg="#e8f4fc")
+    frame_predict.pack(pady=20)
+
+    lbl_sentence = tk.Label(
+        frame_predict,
+        text="💬 Ingresa una frase para predecir la emoción:",
+        font=("Helvetica", 12),
+        bg="#e8f4fc",
+        fg="#004c99"
+    )
+    lbl_sentence.pack(pady=5)
+
+    global entry_sentence
+    entry_sentence = ttk.Entry(frame_predict, width=40, font=("Helvetica", 12))
+    entry_sentence.pack(pady=5)
+
+    btn_predict = tk.Button(root, text="🔍 Predecir emoción", command=predict_emotion, **button_style)
+    btn_predict.pack(pady=20)
+
+    # Footer
+    footer_label = tk.Label(
+        root,
+        text="© 2024 Gerardo Arredondo, Daniela Castro, Luis Cruz, Diego García",
+        font=("Helvetica", 10, "italic"),
+        bg="#e8f4fc",
+        fg="#666"
+    )
+    footer_label.pack(pady=10)
+
+    root.mainloop()
+
+
+# Variables globales para datos y modelo
 data = None
 X_test_vec = None
 y_test = None
@@ -233,8 +284,8 @@ weights = None
 bias = None
 vectorizer = None
 
-root.mainloop()
-
+# Crear la interfaz
+create_interface()
 """
 # Análisis inicial
 print(data.head())  # Vista rápida de los datos
