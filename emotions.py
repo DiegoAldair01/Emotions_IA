@@ -60,6 +60,30 @@ def preprocess_text(text):
 
     return ' '.join(tokens)
 
+"""
+def visualize_text_preprocessing():
+    #Visualizar texto antes y después del preprocesamiento
+    try:
+        if data is None:
+            raise ValueError("No se ha cargado ningún dataset.")
+        
+        # Seleccionar un ejemplo aleatorio
+        example_idx = np.random.randint(0, len(data))
+        original_text = data.iloc[example_idx]['text']
+        processed_text = preprocess_text(original_text)
+
+        # Mostrar los resultados
+        print("Texto original:")
+        print(original_text)
+        print("\nTexto preprocesado:")
+        print(processed_text)
+
+        # Crear una ventana emergente para mostrar el texto
+        messagebox.showinfo("Visualización de Preprocesamiento", f"Texto original:\n{original_text}\n\nTexto preprocesado:\n{processed_text}")
+    except Exception as e:
+        messagebox.showerror("Error", f"No se pudo visualizar el preprocesamiento.\n{e}")
+
+"""
 # Construir la red semántica
 def build_semantic_network(emotions):
     """Crear una red semántica para las emociones"""
@@ -72,6 +96,75 @@ def build_semantic_network(emotions):
                 if word != emotion:
                     G.add_edge(emotion, word)
     return G
+
+"""
+def visualize_semantic_network():
+    # Visualizar una red semántica simple
+    try:
+        emotions = ['joy', 'sadness', 'anger', 'fear', 'love', 'surprise']
+        G = nx.Graph()
+
+        # Agregar nodos y relaciones básicas
+        for emotion in emotions:
+            G.add_node(emotion)
+        relationships = [
+            ('joy', 'love'), 
+            ('love', 'surprise'), 
+            ('sadness', 'fear'), 
+            ('fear', 'anger'), 
+            ('anger', 'surprise')
+        ]
+        G.add_edges_from(relationships)
+
+        # Graficar la red semántica
+        plt.figure(figsize=(8, 6))
+        nx.draw_networkx(G, with_labels=True, node_color='lightblue', node_size=2000, font_size=12, font_weight='bold', edge_color='gray')
+        plt.title("Red Semántica Simple de Emociones", fontsize=16)
+        plt.axis('off')
+        plt.show()
+    except Exception as e:
+        messagebox.showerror("Error", f"No se pudo visualizar la red semántica.\n{e}")
+
+def visualize_semantic_network_for_emotion(emotion):
+    # Visualizar red semántica para una emoción específica
+    try:
+        # Verificar si la emoción está en WordNet
+        synsets = wn.synsets(emotion)
+        if not synsets:
+            raise ValueError(f"No se encontraron relaciones para la emoción '{emotion}' en WordNet.")
+        
+        # Crear la red semántica
+        G = nx.Graph()
+        G.add_node(emotion)
+
+        # Agregar palabras relacionadas
+        related_words = set()
+        for syn in synsets:
+            for lemma in syn.lemmas():
+                word = lemma.name()
+                if word != emotion:
+                    G.add_edge(emotion, word)
+                    related_words.add(word)
+
+        # Graficar la red semántica
+        plt.figure(figsize=(10, 7))
+        nx.draw_networkx(
+            G, 
+            with_labels=True, 
+            node_color='lightblue', 
+            node_size=2000, 
+            font_size=12, 
+            font_weight='bold', 
+            edge_color='gray'
+        )
+        plt.title(f"Red Semántica para '{emotion}'", fontsize=16)
+        plt.axis('off')
+        plt.show()
+
+    except Exception as e:
+        messagebox.showerror("Error", f"No se pudo visualizar la red semántica.\n{e}")
+
+"""
 
 def enrich_with_semantic_network_optimized(X, vectorizer, semantic_network):
     """Enriquecer los datos TF-IDF con la red semántica, optimizado para palabras relevantes."""
@@ -228,9 +321,20 @@ def train_model_thread():
         print("One-hot encoding completado.")
         
         # Entrenar modelo
-        weights, bias, _ = train_gradient_descen(
+        weights, bias, losses = train_gradient_descen(
             X_train_vec, y_train_one, learning_rate=0.01, epochs=100, batch_size=128
         )
+        
+        # Graficar perdida
+        plt.figure(figsize=(10, 6))
+        plt.plot(range(len(losses)), losses, label="Pérdida", marker='o')
+        plt.title("Pérdida durante el entrenamiento")
+        plt.xlabel("Época")
+        plt.ylabel("Pérdida")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+        
         status_label.config(text="Entrenamiento completado.")
         messagebox.showinfo("Éxito", "Entrenamiento completado.")
     except Exception as e:
@@ -328,6 +432,16 @@ def create_interface():
     btn_load = tk.Button(frame_buttons, text="📂 Cargar archivo CSV", command=load_dataset, **button_style)
     btn_load.pack(pady=10)
 
+    """
+    # Botón para visualizar preprocesamiento
+    btn_visualize = tk.Button(frame_buttons, text="🔍 Visualizar preprocesamiento", command=visualize_text_preprocessing, **button_style)
+    btn_visualize.pack(pady=10)
+    
+    # Botón para visualizar red semántica
+    btn_semantic = tk.Button(frame_buttons, text="🔗 Visualizar red semántica", command=visualize_semantic_network, **button_style)
+    btn_semantic.pack(pady=10)
+    """
+    
     # Botón para entrenar modelo
     btn_train = tk.Button(frame_buttons, text="🚀 Entrenar modelo", command=train_model, **button_style)
     btn_train.pack(pady=10)
@@ -335,6 +449,40 @@ def create_interface():
     # Botón para evaluar el modelo
     btn_evaluate = tk.Button(frame_buttons, text="📊 Evaluar modelo", command=evaluate_model, **button_style)
     btn_evaluate.pack(pady=10)
+    
+    """
+    # Botón para visualizar texto antes y después del preprocesamiento
+    btn_visualize_preprocessing = tk.Button(
+        frame_buttons,
+        text="🔍 Ver Preprocesamiento",
+        command=visualize_text_preprocessing,
+        **button_style
+    )
+    btn_visualize_preprocessing.pack(pady=10)
+
+    # Cuadro de texto para ingresar la emoción
+    lbl_emotion = tk.Label(
+        frame_buttons,
+        text="🔤 Ingrese una emoción para la red semántica:",
+        font=("Helvetica", 12),
+        bg="#e8f4fc",
+        fg="#004c99"
+    )
+    lbl_emotion.pack(pady=5)
+
+    entry_emotion = ttk.Entry(frame_buttons, width=20, font=("Helvetica", 12))
+    entry_emotion.pack(pady=5)
+
+
+    # Botón para visualizar la red semántica de una emoción
+    btn_visualize_emotion_network = tk.Button(
+        frame_buttons, 
+        text="🌐 Ver Red Semántica", 
+        command=lambda: visualize_semantic_network_for_emotion(entry_emotion.get()), 
+        **button_style
+    )
+    btn_visualize_emotion_network.pack(pady=10)
+    """
 
     # Label para mostrar el estado del entrenamiento
     status_label = tk.Label(
